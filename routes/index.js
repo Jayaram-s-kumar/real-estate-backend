@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+const nodemailer = require('nodemailer')
+
 
 const mongoose = require('mongoose');
 const { response } = require('../app');
@@ -94,6 +96,37 @@ router.get('/getallapartments',async(req,res)=>{
   let data  = await propertyModel.find({ "propType": "Apartments" } ).lean()
   res.send(data)
   console.log('getallhouse called')
+})
+
+router.post('/sendinforeq',(req,res)=>{
+  console.log(req.body)
+  res.send("hello")
+  console.log("sendinforeq called")
+  const user = "lensikoviski@gmail.com"
+  const password = "yjeg ywmv wsvb jrab"
+  const transport = nodemailer.createTransport({
+    service: "Gmail", 
+    auth: {
+      user: user,
+      pass: password
+    }
+  })  
+  try {
+    transport.sendMail({
+      from: user,
+      to: req.body.ownerEmail,
+      subject: "Information Request",
+      html: `<h1>You have a new client </h1>
+                  <p>email:${req.body.email}</P>
+                  <p>phone:${req.body.phone}</P>
+                  <p>name:${req.body.name}</P>
+                  <p>Message:${req.body.message}</P>`
+    })
+    console.log("message send to")
+  } catch (error) {
+    console.log("error is:", error)
+  }
+
 })
 
 module.exports = router;
