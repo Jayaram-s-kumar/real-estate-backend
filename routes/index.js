@@ -115,12 +115,21 @@ router.post('/sendinforeq',(req,res)=>{
     transport.sendMail({
       from: user,
       to: req.body.ownerEmail,
-      subject: "Information Request",
-      html: `<h1>You have a new client </h1>
-                  <p>email:${req.body.email}</P>
-                  <p>phone:${req.body.phone}</P>
-                  <p>name:${req.body.name}</P>
-                  <p>Message:${req.body.message}</P>`
+      subject: "Information Request for Property", 
+  html: `
+    <p>Dear Property Owner,</p>
+    <p>You have received a request for more information about the property <strong>${req.body.propName}</strong> from:</p>
+    <ul>
+      <li>Name: ${req.body.name}</li>
+      <li>Email: ${req.body.email}</li>
+      <li>Phone Number: ${req.body.phone}</li>
+    </ul>
+    <p>Here's the message from the client:</p>
+    <p>${req.body.message}</p><br><br>
+    <p>Please contact them at your earliest convenience.</p>
+    <p>Thank you,</p>
+    <p>Your Real Estate Website Team</p>
+  `
     })
     console.log("message send to")
   } catch (error) {
