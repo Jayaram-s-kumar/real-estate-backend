@@ -4,10 +4,12 @@ const nodemailer = require('nodemailer')
 
 
 const mongoose = require('mongoose');
-const { response } = require('../app');
+
+
 
 const loginModel = mongoose.model('logininfo')
 const propertyModel = mongoose.model('propertyDetails')
+const carModel = mongoose.model('carDetails')
 
 router.post('/signup', async (req, res) => {
   let exist = await loginModel.findOne({ email: req.body.email })
@@ -137,5 +139,63 @@ router.post('/sendinforeq',(req,res)=>{
   }
 
 })
+
+
+router.post('/uploadCar',async(req,res)=>{
+  console.log("Enterd in car upload ")
+  console.log(req.body)
+  const newmodel = new carModel(req.body)
+  await newmodel.save().then((response)=>{
+    res.send(response)
+  }) 
+ 
+})
+
+router.get('/getcardata/:ID',async(req,res)=>{
+  console.log("Enterd into get cardata")
+  let data = await carModel.findOne({_id:req.params.ID})
+  res.send(data)
+  console.log(data)
+  
+})
+
+router.get('/first3cars',async(req,res)=>{
+  let data  = await carModel.find({}).limit(3).lean()
+  res.send(data)
+   console.log(data)
+  console.log("first3cars called")
+}) 
+
+
+router.get('/getallcars',async(req,res)=>{
+  let data  = await carModel.find({}).lean()
+  res.send(data)
+  console.log('getallcars called')
+})
+
+router.get('/getmyproperties/:ID',async(req,res)=>{
+  let data = await propertyModel.find({ownerID:req.params.ID}).lean()
+  res.send(data)
+  console.log(data)
+  console.log("Enterd into my proprties")
+})
+
+router.get('/getmycars/:ID',async(req,res)=>{
+  let data = await carModel.find({ownerID:req.params.ID}).lean()
+  res.send(data)
+  console.log(data)
+  console.log("Enterd into my cars")
+})
+
+router.get('/deleteprop/:ID',async(req,res)=>{
+  await propertyModel.deleteOne({_id:req.params.ID})
+  console.log('Enterd into delete property')
+})
+
+router.get('/deletecar/:ID',async(req,res)=>{
+  await carModel.deleteOne({_id:req.params.ID})
+  console.log('Enterd into delete car')
+})
+  
 
 module.exports = router;

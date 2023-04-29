@@ -2,6 +2,7 @@ var express = require('express');
 
 require('./Schemas/loginSchema')
 require('./Schemas/PorpertySchema')
+require('./Schemas/CarSchema')
 
 
 var indexRouter = require('./routes/index');
@@ -28,7 +29,7 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 
 
 const db = mongoose.connection
-
+  
 
 db.on('error', (error) => {
     console.error("mongodb connection error", error)
@@ -39,7 +40,7 @@ db.once('open', function () {
     app.listen(PORT, () => {
         console.log("App listening on port", PORT)
     })
-})  
+})    
 
 
 
