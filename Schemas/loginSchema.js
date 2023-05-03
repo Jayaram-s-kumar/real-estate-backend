@@ -8,6 +8,9 @@ const loginSchema = new mongoose.Schema({
     password:{
         required:true,
         type:String  
+    },
+    otp:{
+        type:String
     }
 })
  

@@ -196,6 +196,95 @@ router.get('/deletecar/:ID',async(req,res)=>{
   await carModel.deleteOne({_id:req.params.ID})
   console.log('Enterd into delete car')
 })
+
+
+const SendOtp = (email)=>{
+  OTP=''
+  const user = "lensikoviski@gmail.com"
+  const password = "yjeg ywmv wsvb jrab"
+  const transport = nodemailer.createTransport({
+    service: "Gmail", 
+    auth: {
+      user: user,
+      pass: password
+    }
+  })
+
+  var digits = '0123456789';
+
+  for (let i = 0; i < 6; i++) {
+    OTP += digits[Math.floor(Math.random() * 10)];
+  }
+
+  try {
+    transport.sendMail({
+      from: user,
+      to: email,
+      subject: "Password reset",
+      html: `<h1>Email confirmation</h1>
+                  <p>hello ${email}</P>
+                  <p>Your otp for password resetting is  <b> ${OTP} </b></P>`
+    })
+    console.log("otp send to",email)
+  } catch (error) {
+    console.log("error is:", error)
+  }
+  return OTP  
+} 
+
+router.post('/sendregemail', async (req, res) => {
+  let ifexist = await loginModel.findOne({ email: req.body.email });
+  if (ifexist) {
+    const otp = SendOtp(req.body.email);
+    await loginModel.findOneAndUpdate({email:ifexist.email,
+                                        password:ifexist.password,
+                                         $set:{
+                                          otp
+                                         } });
+ 
+    res.send({ message: 'email exist' });
+  } else {
+    res.send({ message: 'email not registerd' });
+  }
+  console.log('ENTERD into regemail');
+  console.log(ifexist);
+});
+
+
+router.post('/resend-otp',async(req,res)=>{
+  let email = req.body.email;
+  let otp = SendOtp(email)
+  await loginModel.updateOne({email:req.body.email},{
+    $set:{
+      otp
+    }
+  })
+  console.log("Enterd into resend otp")
+  console.log(otp)
+})
+
+router.post('/verify-otp',async(req,res)=>{
+  let userOtp =  req.body.otp
+  let dbOtp = (await loginModel.findOne({email:req.body.email})).otp
+  if(userOtp===dbOtp){
+    res.send({ message: 'otp match' });
+  }else{
+    res.send({ message: 'otp not match' });
+  }
+  console.log(userOtp)
+  console.log(dbOtp)
+})
+
+router.post('/updatepass', async(req,res)=>{
+  console.log("Enterd into new pass")
+  await loginModel.findOneAndUpdate({email:req.body.email},{
+    $set:{
+      password:req.body.password
+    }
+  })
+  res.send({message:'password changed'}) 
+})  
+
   
 
 module.exports = router;
