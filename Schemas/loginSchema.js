@@ -11,6 +11,12 @@ const loginSchema = new mongoose.Schema({
     },
     otp:{
         type:String
+    },
+    profimgLink:{
+        type:String
+    },
+    address:{
+        type:String
     }
 })
  

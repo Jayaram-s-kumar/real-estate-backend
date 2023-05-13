@@ -17,7 +17,6 @@ router.post('/signup', async (req, res) => {
 
     return res.send({ "message": "email already exist" })
   } else {
-    console.log(req.body)
     const newmodel = new loginModel()
     newmodel.email = req.body.email
     newmodel.password = req.body.password
@@ -57,7 +56,6 @@ router.post('/signin', async (req, res) => {
 
 router.post('/uploadProp',async(req,res)=>{
   console.log("Enterd in upload ")
-  console.log(req.body)
   const newmodel = new propertyModel(req.body)
   await newmodel.save().then((response)=>{
     res.send(response)
@@ -68,14 +66,12 @@ router.post('/uploadProp',async(req,res)=>{
 router.get('/first3houses',async(req,res)=>{
   let data  = await propertyModel.find({ "propType": { $ne: "Apartments" } }).limit(3).lean()
   res.send(data)
-  // console.log(data)
   console.log("first3houses called")
 }) 
 
 router.get('/first3apartments',async(req,res)=>{
   let data  = await propertyModel.find({ "propType": "Apartments" }).limit(3).lean()
   res.send(data)
-  // console.log(data)
   console.log("first3apartments called")
 }) 
 
@@ -83,7 +79,6 @@ router.get('/first3apartments',async(req,res)=>{
 router.get('/getPropData/:ID',async(req,res)=>{
   let data = await propertyModel.findOne({_id:req.params.ID})
   res.send(data)
-  console.log(data)
   console.log("getPropData called")
 })
 
@@ -101,7 +96,6 @@ router.get('/getallapartments',async(req,res)=>{
 })
 
 router.post('/sendinforeq',(req,res)=>{
-  console.log(req.body)
   res.send("hello")
   console.log("sendinforeq called")
   const user = "lensikoviski@gmail.com"
@@ -143,7 +137,6 @@ router.post('/sendinforeq',(req,res)=>{
 
 router.post('/uploadCar',async(req,res)=>{
   console.log("Enterd in car upload ")
-  console.log(req.body)
   const newmodel = new carModel(req.body)
   await newmodel.save().then((response)=>{
     res.send(response)
@@ -155,7 +148,6 @@ router.get('/getcardata/:ID',async(req,res)=>{
   console.log("Enterd into get cardata")
   let data = await carModel.findOne({_id:req.params.ID})
   res.send(data)
-  console.log(data)
   
 })
 
@@ -176,14 +168,12 @@ router.get('/getallcars',async(req,res)=>{
 router.get('/getmyproperties/:ID',async(req,res)=>{
   let data = await propertyModel.find({ownerID:req.params.ID}).lean()
   res.send(data)
-  console.log(data)
   console.log("Enterd into my proprties")
 })
 
 router.get('/getmycars/:ID',async(req,res)=>{
   let data = await carModel.find({ownerID:req.params.ID}).lean()
   res.send(data)
-  console.log(data)
   console.log("Enterd into my cars")
 })
 
@@ -247,7 +237,6 @@ router.post('/sendregemail', async (req, res) => {
     res.send({ message: 'email not registerd' });
   }
   console.log('ENTERD into regemail');
-  console.log(ifexist);
 });
 
 
@@ -271,8 +260,8 @@ router.post('/verify-otp',async(req,res)=>{
   }else{
     res.send({ message: 'otp not match' });
   }
-  console.log(userOtp)
-  console.log(dbOtp)
+  console.log("userOtp is",userOtp)
+  console.log("dBOtp is",dbOtp)
 })
 
 router.post('/updatepass', async(req,res)=>{
@@ -285,6 +274,41 @@ router.post('/updatepass', async(req,res)=>{
   res.send({message:'password changed'}) 
 })  
 
+router.post('/upprofimg',async(req,res)=>{
+  console.log(req.body)
+  console.log("profile image called")
+  console.log(req.body.profileimg)
+  await loginModel.updateOne({
+    _id:req.body.loginID
+  },{
+    $set:{
+      profimgLink:req.body.profileimg
+    }
+  }).then(data=>console.log(data))
+  
+})
+
+router.get('/getprofimg/:loginID',async(req,res)=>{
+  console.log("get profile image called")
+ // console.log(req.params)
+  let dbdata = await loginModel.findOne({_id:req.params.loginID})
+  res.send(dbdata)
+ 
+})
+
+router.post('/addaddress',async(req,res)=>{
+  console.log("add adress called")
+  console.log(req.body)
+  await loginModel.updateOne({
+    _id:req.body.loginID
+  },{
+    $set:{
+      address:req.body.address
+    }
+  }).then(data=>console.log(data))
+  
+})
+ 
   
 
-module.exports = router;
+module.exports = router; 
