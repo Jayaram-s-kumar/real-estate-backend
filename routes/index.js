@@ -152,7 +152,7 @@ router.get('/getcardata/:ID',async(req,res)=>{
 })
 
 router.get('/first3cars',async(req,res)=>{
-  let data  = await carModel.find({}).limit(3).lean()
+  let data  = await carModel.find({}).limit(6).lean()
   res.send(data)
    console.log(data)
   console.log("first3cars called")

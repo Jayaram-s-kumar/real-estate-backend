@@ -15,6 +15,10 @@ const propertySchema = new mongoose.Schema({
         "type": "string",
         required: true
     },
+    "ownName":{
+        "type": "string",
+        required: true
+    },
     "phone": {
         "type": "string",
         required: true
