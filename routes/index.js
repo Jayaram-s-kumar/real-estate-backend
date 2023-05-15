@@ -64,33 +64,59 @@ router.post('/uploadProp',async(req,res)=>{
 })
 
 router.get('/first3houses',async(req,res)=>{
-  let data  = await propertyModel.find({ "propType": { $ne: "Apartments" } }).limit(3).lean()
+  let data  = await propertyModel.find({ "propType": { $ne: "Apartments" } }).sort({_id:-1}).limit(3).lean()
   res.send(data)
   console.log("first3houses called")
 }) 
 
 router.get('/first3apartments',async(req,res)=>{
-  let data  = await propertyModel.find({ "propType": "Apartments" }).limit(3).lean()
+  let data  = await propertyModel.find({ "propType": "Apartments" }).sort({_id:-1}).limit(3).lean()
   res.send(data)
   console.log("first3apartments called")
 }) 
 
 
-router.get('/getPropData/:ID',async(req,res)=>{
-  let data = await propertyModel.findOne({_id:req.params.ID})
-  res.send(data)
-  console.log("getPropData called")
+router.get('/getPropData/:ID', async (req, res) => {
+  try {
+    const data = await propertyModel.findOne({ _id: req.params.ID });
+    if (!data) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+    console.log("getPropData called", data);
+    res.json(data);
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+router.get('/getcardata/:ID',async(req,res)=>{
+  console.log("Enterd into get cardata")
+  try {
+    const data = await carModel.findOne({ _id: req.params.ID });
+    if (!data) {
+      return res.status(404).json({ error: 'Car not found' });
+    }
+    console.log("getcardata called", data);
+    res.json(data);
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+  
 })
 
+
 router.get('/getallhouses',async(req,res)=>{
-  let data  = await propertyModel.find({ "propType": { $ne: "Apartments" } }).lean()
+  let data  = await propertyModel.find({ "propType": { $ne: "Apartments" } }).sort({_id:-1}).lean()
   res.send(data)
   console.log('getallhouse called')
 })
 
 
 router.get('/getallapartments',async(req,res)=>{
-  let data  = await propertyModel.find({ "propType": "Apartments" } ).lean()
+  let data  = await propertyModel.find({ "propType": "Apartments" } ).sort({_id:-1}).lean()
   res.send(data)
   console.log('getallhouse called')
 })
@@ -144,15 +170,10 @@ router.post('/uploadCar',async(req,res)=>{
  
 })
 
-router.get('/getcardata/:ID',async(req,res)=>{
-  console.log("Enterd into get cardata")
-  let data = await carModel.findOne({_id:req.params.ID})
-  res.send(data)
-  
-})
+
 
 router.get('/first3cars',async(req,res)=>{
-  let data  = await carModel.find({}).limit(6).lean()
+  let data  = await carModel.find({}).limit(6).sort({_id:-1}).lean()
   res.send(data)
    console.log(data)
   console.log("first3cars called")
@@ -160,7 +181,7 @@ router.get('/first3cars',async(req,res)=>{
 
 
 router.get('/getallcars',async(req,res)=>{
-  let data  = await carModel.find({}).lean()
+  let data  = await carModel.find({}).sort({_id:-1}).lean()
   res.send(data)
   console.log('getallcars called')
 })
