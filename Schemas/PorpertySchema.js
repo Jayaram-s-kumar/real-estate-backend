@@ -33,7 +33,6 @@ const propertySchema = new mongoose.Schema({
     },
     "lotsize": {
         "type": "string",
-        required: true
     },
     "year": {
         "type": "string",
