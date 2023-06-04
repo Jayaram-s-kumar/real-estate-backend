@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer')
 
 
 const mongoose = require('mongoose');
+const { generateToken,authenticateToken } = require('../middlewares/verification');
 
 
 
@@ -37,11 +38,13 @@ router.post('/signin', async (req, res) => {
 
   if (ifExist) {
     if (req.body.password === ifExist.password) {
+      const token = generateToken(ifExist)
       console.log("signed in")
       res.send({
         message: "signed in",
         email: ifExist.email,
         loginID: ifExist._id,
+        token:`bearer ${token}`
       })
     } else {
       res.send({ message: "password error" })
@@ -54,7 +57,7 @@ router.post('/signin', async (req, res) => {
 })
 
 
-router.post('/uploadProp', async (req, res) => {
+router.post('/uploadProp',authenticateToken, async (req, res) => {
   console.log("Enterd in upload ")
   const newmodel = new propertyModel(req.body)
   await newmodel.save().then((response) => {
@@ -76,13 +79,13 @@ router.get('/first3apartments', async (req, res) => {
 })
 
 
-router.get('/getPropData/:ID', async (req, res) => {
+router.get('/getPropData/:ID',authenticateToken, async (req, res) => {
   try {
     const data = await propertyModel.findOne({ _id: req.params.ID });
     if (!data) {
       return res.status(404).json({ error: 'Property not found' });
     }
-    console.log("getPropData called", data);
+    console.log("getPropData called");
     res.json(data);
   } catch (err) {
     console.error('Error fetching data:', err);
@@ -91,14 +94,14 @@ router.get('/getPropData/:ID', async (req, res) => {
 });
 
 
-router.get('/getcardata/:ID', async (req, res) => {
+router.get('/getcardata/:ID',authenticateToken, async (req, res) => {
   console.log("Enterd into get cardata")
   try {
     const data = await carModel.findOne({ _id: req.params.ID });
     if (!data) {
       return res.status(404).json({ error: 'Car not found' });
     }
-    console.log("getcardata called", data);
+    console.log("getcardata called");
     res.json(data);
   } catch (err) {
     console.error('Error fetching data:', err);
@@ -108,20 +111,20 @@ router.get('/getcardata/:ID', async (req, res) => {
 })
 
 
-router.get('/getallhouses', async (req, res) => {
+router.get('/getallhouses',authenticateToken, async (req, res) => {
   let data = await propertyModel.find({ "propType": { $ne: "Apartments" } }).sort({ _id: -1 }).lean()
   res.send(data)
   console.log('getallhouse called')
 })
 
 
-router.get('/getallapartments', async (req, res) => {
+router.get('/getallapartments',authenticateToken, async (req, res) => {
   let data = await propertyModel.find({ "propType": "Apartments" }).sort({ _id: -1 }).lean()
   res.send(data)
   console.log('getallhouse called')
 })
 
-router.post('/sendinforeq', (req, res) => {
+router.post('/sendinforeq',authenticateToken, (req, res) => {
   res.send("hello")
   console.log("sendinforeq called")
   const user = "lensikoviski@gmail.com"
@@ -161,7 +164,7 @@ router.post('/sendinforeq', (req, res) => {
 })
 
 
-router.post('/uploadCar', async (req, res) => {
+router.post('/uploadCar',authenticateToken, async (req, res) => {
   console.log("Enterd in car upload ")
   const newmodel = new carModel(req.body)
   await newmodel.save().then((response) => {
@@ -175,36 +178,37 @@ router.post('/uploadCar', async (req, res) => {
 router.get('/first3cars', async (req, res) => {
   let data = await carModel.find({}).limit(6).sort({ _id: -1 }).lean()
   res.send(data)
-  console.log(data)
+ // console.log(data)
   console.log("first3cars called")
 })
 
 
-router.get('/getallcars', async (req, res) => {
+router.get('/getallcars',authenticateToken, async (req, res) => {
   let data = await carModel.find({}).sort({ _id: -1 }).lean()
   res.send(data)
   console.log('getallcars called')
 })
 
-router.get('/getmyproperties/:ID', async (req, res) => {
+router.get('/getmyproperties/:ID',authenticateToken, async (req, res) => {
+  //console.log(req.headers)
   let data = await propertyModel.find({ ownerID: req.params.ID }).lean()
   res.send(data)
   console.log("Enterd into my proprties")
 })
 
-router.get('/getmycars/:ID', async (req, res) => {
+router.get('/getmycars/:ID',authenticateToken, async (req, res) => {
   let data = await carModel.find({ ownerID: req.params.ID }).lean()
   res.send(data)
   console.log("Enterd into my cars")
 })
 
-router.get('/deleteprop/:ID', async (req, res) => {
+router.get('/deleteprop/:ID',authenticateToken, async (req, res) => {
   await propertyModel.deleteOne({ _id: req.params.ID })
   console.log('Enterd into delete property')
   res.send({ message: 'deleted' })
 })
 
-router.get('/deletecar/:ID', async (req, res) => {
+router.get('/deletecar/:ID',authenticateToken, async (req, res) => {
   await carModel.deleteOne({ _id: req.params.ID })
   console.log('Enterd into delete car')
 
@@ -300,10 +304,10 @@ router.post('/updatepass', async (req, res) => {
   res.send({ message: 'password changed' })
 })
 
-router.post('/upprofimg', async (req, res) => {
-  console.log(req.body)
+router.post('/upprofimg',authenticateToken, async (req, res) => {
+ // console.log(req.body)
   console.log("profile image called")
-  console.log(req.body.profileimg)
+ // console.log(req.body.profileimg)
   await loginModel.updateOne({
     _id: req.body.loginID
   }, {
@@ -314,7 +318,7 @@ router.post('/upprofimg', async (req, res) => {
 
 })
 
-router.get('/getprofimg/:loginID', async (req, res) => {
+router.get('/getprofimg/:loginID',authenticateToken, async (req, res) => {
   console.log("get profile image called")
   // console.log(req.params)
   let dbdata = await loginModel.findOne({ _id: req.params.loginID })
@@ -322,7 +326,7 @@ router.get('/getprofimg/:loginID', async (req, res) => {
 
 })
 
-router.post('/addaddress', async (req, res) => {
+router.post('/addaddress',authenticateToken, async (req, res) => {
   console.log("add adress called")
   console.log(req.body)
   await loginModel.updateOne({

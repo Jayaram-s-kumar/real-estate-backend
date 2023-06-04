@@ -4,6 +4,9 @@ require('./Schemas/loginSchema')
 require('./Schemas/PorpertySchema')
 require('./Schemas/CarSchema')
 
+const dotenv = require('dotenv')
+dotenv.config()
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/seller');
