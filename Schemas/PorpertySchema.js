@@ -70,6 +70,10 @@ const propertySchema = new mongoose.Schema({
         "type": "string",
         required: true
     },
+    "bhk":{
+        "type": "string",
+        required: true
+    },
     "description": {
         "type": "string",
         required: true
